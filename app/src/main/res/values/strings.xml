@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Wish you were here</string>
+    <string name="title"> Pass Task 2A</string>
+
+    <string name="kfc_title">KFC</string>
+    <string name="mcdonalds_title">Mcdonalds</string>
+    <string name="dominos_title">Dominos</string>
+    <string name="pizzahut_title">Pizzahut</string>
+
+    <string name="kfc_rating">1</string>
+    <string name="mcdonalds_rating">2</string>
+    <string name="dominos_rating">2</string>
+    <string name="pizzahut_rating">2</string>
+</resources>
