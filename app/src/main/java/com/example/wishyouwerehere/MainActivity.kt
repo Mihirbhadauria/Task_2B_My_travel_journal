@@ -3,6 +3,7 @@ package com.example.wishyouwerehere
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.RatingBar
@@ -60,6 +61,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         mcdonaldsImageView.setOnClickListener {
+            Log.d("DEBUG", "McDonald's image clicked")
             val restaurant = Restaurant(
                 name = getString(R.string.mcdonalds_title),
                 imageResId = R.drawable.mcdonalds_1
@@ -67,6 +69,8 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, DetailsActivity::class.java)
             intent.putExtra("restaurant_data", restaurant)
             startActivity(intent)
+
+
         }
 
         dominosImageView.setOnClickListener {
@@ -77,9 +81,11 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, DetailsActivity::class.java)
             intent.putExtra("restaurant_data", restaurant)
             startActivity(intent)
+
         }
 
         pizzahutImageView.setOnClickListener {
+            Log.d("DEBUG", "pizzahut's image clicked")
             val restaurant = Restaurant(
                 name = getString(R.string.pizzahut_title),
                 imageResId = R.drawable.pizzahut
@@ -87,47 +93,64 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, DetailsActivity::class.java)
             intent.putExtra("restaurant_data", restaurant)
             startActivity(intent)
+
         }
     }
 
+
     override fun onResume() {
         super.onResume()
-        updateRatingValue()
+        updateRatingValues()
     }
 
-    private fun updateRatingValue() {
-        val tvRatingValue: TextView = findViewById(R.id.dominos_ratingValue)
+    private fun updateRatingValues() {
+        val tvDominosRatingValue: TextView = findViewById(R.id.dominos_ratingValue)
+        val savedDominosRating = PreferenceHelper.getRating(this, getString(R.string.dominos_title))
+        Log.d("DEBUG", "Retrieved rating for Dominos: $savedDominosRating")
+        tvDominosRatingValue.text = "$savedDominosRating"
 
-        // Retrieve and display the saved rating
-        val savedRating = PreferenceHelper.getRating(this)
-        tvRatingValue.text = "$savedRating"
+        val tvKFCRatingValue: TextView = findViewById(R.id.kfc_ratingValue)
+        val savedKFCRating = PreferenceHelper.getRating(this, getString(R.string.kfc_title))
+        Log.d("DEBUG", "Retrieved rating for KFC: $savedKFCRating")
+        tvKFCRatingValue.text = "$savedKFCRating"
+
+        val tvMcDonaldsRatingValue: TextView = findViewById(R.id.mcd_ratingValue)
+        val savedMcDonaldsRating = PreferenceHelper.getRating(this, getString(R.string.mcdonalds_title))
+        Log.d("DEBUG", "Retrieved rating for Mcdonalds: $savedMcDonaldsRating")
+        tvMcDonaldsRatingValue.text = "$savedMcDonaldsRating"
+
+        val tvPizzaHutRatingValue: TextView = findViewById(R.id.pizzahut_ratingValue)
+        val savedPizzaHutRating = PreferenceHelper.getRating(this, getString(R.string.pizzahut_title))
+        Log.d("DEBUG", "Retrieved rating for Pizzahut: $savedPizzaHutRating")
+        tvPizzaHutRatingValue.text = "$savedPizzaHutRating"
     }
-
 }
 
 class DetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("DEBUG", "DetailsActivity started")
         setContentView(R.layout.detailed_view)
 
         val restaurant: Restaurant? = intent.getParcelableExtra("restaurant_data")
-
         val imageView: ImageView = findViewById(R.id.sp_dominos_image)
-        val nameTextView: TextView = findViewById(R.id.sp_dominos_name)
-        val ratingBar: RatingBar = findViewById(R.id.dominos_ratingBar) // Assuming you have a RatingBar with this ID in activity_dominos.xml
-
-        // Set the saved rating to the RatingBar
-        ratingBar.rating = PreferenceHelper.getRating(this)
-
-        ratingBar.setOnRatingBarChangeListener { _, rating, _ ->
-            // Save the new rating
-            PreferenceHelper.saveRating(this, rating)
-        }
+        val nameTextView: TextView = findViewById(R.id.sp_restaurant_name)
+        val ratingBar: RatingBar = findViewById(R.id.dominos_ratingBar)
 
         restaurant?.let {
             imageView.setImageResource(it.imageResId)
             nameTextView.text = it.name
+
+            // Set the saved rating to the RatingBar
+            ratingBar.rating = PreferenceHelper.getRating(this, it.name)
+
+            ratingBar.setOnRatingBarChangeListener { _, rating, _ ->
+                restaurant?.let {
+                    PreferenceHelper.saveRating(this, it.name, rating)
+                    Log.d("DEBUG", "Saved rating $rating for ${it.name}")
+                }
+            }
         }
     }
 }
